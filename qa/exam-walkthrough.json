@@ -1,0 +1,28 @@
+[
+  {
+    "case": "blank",
+    "score": 0,
+    "max": 17,
+    "result": "5项能力均0分，开放表达不计分"
+  },
+  {
+    "case": "partial",
+    "score": 1.5,
+    "max": 17,
+    "result": "Q1单项1分+Q5函数0.5分；草稿不加分"
+  },
+  {
+    "case": "full-after-edit",
+    "score": 17,
+    "max": 17,
+    "result": "五项实际得分3、4、3、4、3"
+  },
+  {
+    "case": "refresh",
+    "result": "重开页面仍保留独立模式和17分答卷"
+  },
+  {
+    "case": "teacher-isolation",
+    "result": "教师跳到第6幕、展开三级提示，独立答卷仍17分"
+  }
+]

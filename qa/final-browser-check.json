@@ -1,0 +1,41 @@
+{
+  "date": "2026-08-27T16:42:01.302Z",
+  "base": "http://127.0.0.1:3004/",
+  "freshStudent": {
+    "height": 1006,
+    "initialChoices": [
+      "01数据提示可能存在对女性不利的现象",
+      "02男性申请者能力更强",
+      "03只能确认总体差异，还不能判断原因"
+    ],
+    "mathErrors": 0,
+    "mode": "explore",
+    "nextDisabled": true,
+    "progressIsZero": true,
+    "scene": "两边都高，为什么合起来反而低？",
+    "scrollWidth": 1890,
+    "width": 1890
+  },
+  "finalFormulaCheck": {
+    "compactVisible": true,
+    "height": 844,
+    "mathErrors": 0,
+    "mathML": 4,
+    "scene": 11,
+    "scrollWidth": 390,
+    "width": 390
+  },
+  "finalFunctionCheck": {
+    "compactVisible": true,
+    "fontsStatus": "loaded",
+    "height": 844,
+    "mainFont": true,
+    "mathErrors": 0,
+    "mathFont": true,
+    "mathML": 2,
+    "scene": 25,
+    "scrollWidth": 390,
+    "width": 390
+  },
+  "productionConsoleErrors": []
+}

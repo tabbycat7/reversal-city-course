@@ -1,0 +1,63 @@
+
+> reversal-city-course@1.0.0 check
+> npm run typecheck && npm run lint && npm test
+
+
+> reversal-city-course@1.0.0 typecheck
+> tsc --noEmit
+
+
+> reversal-city-course@1.0.0 lint
+> eslint . --ignore-pattern dist --ignore-pattern .next
+
+
+> reversal-city-course@1.0.0 test
+> node --experimental-strip-types --test tests/*.test.mjs
+
+✔ A/D slice is exactly 1725 fixed, uniquely identified records (0.512334ms)
+✔ filter chain preserves identity and gives 1725 → 483 → 108 → 89 (0.537125ms)
+✔ raw conditional and total rates use counts, not rounded rates (0.112083ms)
+✔ same weights 0 keep the female within-group advantage (0.039875ms)
+✔ same weights 0.2 keep the female within-group advantage (0.03825ms)
+✔ same weights 0.5 keep the female within-group advantage (0.524834ms)
+✔ same weights 0.9 keep the female within-group advantage (0.033042ms)
+✔ same weights 1 keep the female within-group advantage (0.023375ms)
+✔ different weights do not guarantee reversal (0.047333ms)
+✔ feasible exact balance is classified equal, not a rounding artifact (0.070041ms)
+✔ opposite weight endpoints and out-of-range guards (0.06175ms)
+✔ training and examination datasets are distinct (0.054541ms)
+✔ training shared population at λ=0 (0.033917ms)
+✔ training shared population at λ=0.5 (0.021125ms)
+✔ training shared population at λ=1 (0.014083ms)
+✔ exam shared population at λ=0 (0.013083ms)
+✔ exam shared population at λ=0.5 (0.024375ms)
+✔ exam shared population at λ=1 (0.016209ms)
+✔ difference is 5–15 percentage points across all allowed weights (0.047209ms)
+✔ random allocation only removes arrows entering treatment (0.055833ms)
+✔ graph helper handles direction, duplicate sets and cycles (0.052917ms)
+✔ numeric input accepts decimals and a percent suffix, rejects empty or executable text (0.125209ms)
+✔ full exam returns actual 17/17 in five dimensions (0.182042ms)
+✔ blank exam has zero points; unrelated prose never grants credit (0.049959ms)
+✔ partial exam and fractional rubric points (0.056583ms)
+✔ editing and resubmitting recomputes; no score is frozen or hard-coded (0.047208ms)
+✔ small decimal coefficients and percentage-point answers reject a percent suffix (0.088542ms)
+✔ formula puzzle accepts commutative equivalent sums and products, rejects crossed departments (0.06075ms)
+✔ incorrect coefficient or mismatched treatment/data is not accepted (0.036167ms)
+✔ default storage is local/versioned and modes have separate state objects (0.092042ms)
+✔ save/restore retains progress, answers, parameters and settings separately (0.150125ms)
+✔ corrupt, missing, wrong-version and out-of-range saves safely recover (0.111542ms)
+✔ storage access or quota failure never prevents learning in memory (0.074584ms)
+✔ student progression is gated, teacher jumps do not unlock student state (0.036791ms)
+✔ 40 scenes form six consecutive chapters with objectives and three hints (0.1205ms)
+✔ data scope labels do not mix full school, A/D, training or examination (0.05725ms)
+✔ local original art and entry assets are present (0.166959ms)
+✔ KaTeX renders core formulas with MathML, including every symbolic family (3.505667ms)
+✔ runtime imports use local assets and no external font/CDN/AI endpoint (0.244417ms)
+ℹ tests 39
+ℹ suites 0
+ℹ pass 39
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 72.284166

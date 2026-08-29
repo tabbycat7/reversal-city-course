@@ -1,0 +1,386 @@
+{
+  "date": "2026-08-27T16:37:09.769Z",
+  "base": "http://127.0.0.1:3004/",
+  "totalFiles": 74,
+  "fontFiles": 59,
+  "cssAssetReferences": 61,
+  "bytes": 25128567,
+  "checks": [
+    {
+      "path": "/art/alan-expressions-2x2.png",
+      "status": 200,
+      "bytes": 1473966
+    },
+    {
+      "path": "/art/causal-workshop.png",
+      "status": 200,
+      "bytes": 2675956
+    },
+    {
+      "path": "/art/city-map.png",
+      "status": 200,
+      "bytes": 2763210
+    },
+    {
+      "path": "/art/conditional-station.png",
+      "status": 200,
+      "bytes": 2571448
+    },
+    {
+      "path": "/art/dual_world_lab.png",
+      "status": 200,
+      "bytes": 2555701
+    },
+    {
+      "path": "/art/observation_rooftop.png",
+      "status": 200,
+      "bytes": 2587817
+    },
+    {
+      "path": "/art/reasoning_tower.png",
+      "status": 200,
+      "bytes": 2162422
+    },
+    {
+      "path": "/art/reversal-plaza.png",
+      "status": 200,
+      "bytes": 2961443
+    },
+    {
+      "path": "/art/robot-blink-4x1.png",
+      "status": 200,
+      "bytes": 965581
+    },
+    {
+      "path": "/assets/KaTeX_AMS-Regular-BQhdFMY1.woff2",
+      "status": 200,
+      "bytes": 28076
+    },
+    {
+      "path": "/assets/KaTeX_AMS-Regular-DMm9YOAa.woff",
+      "status": 200,
+      "bytes": 33516
+    },
+    {
+      "path": "/assets/KaTeX_AMS-Regular-DRggAlZN.ttf",
+      "status": 200,
+      "bytes": 63632
+    },
+    {
+      "path": "/assets/KaTeX_Caligraphic-Bold-ATXxdsX0.ttf",
+      "status": 200,
+      "bytes": 12368
+    },
+    {
+      "path": "/assets/KaTeX_Caligraphic-Bold-BEiXGLvX.woff",
+      "status": 200,
+      "bytes": 7716
+    },
+    {
+      "path": "/assets/KaTeX_Caligraphic-Bold-Dq_IR9rO.woff2",
+      "status": 200,
+      "bytes": 6912
+    },
+    {
+      "path": "/assets/KaTeX_Caligraphic-Regular-CTRA-rTL.woff",
+      "status": 200,
+      "bytes": 7656
+    },
+    {
+      "path": "/assets/KaTeX_Caligraphic-Regular-Di6jR-x-.woff2",
+      "status": 200,
+      "bytes": 6908
+    },
+    {
+      "path": "/assets/KaTeX_Caligraphic-Regular-wX97UBjC.ttf",
+      "status": 200,
+      "bytes": 12344
+    },
+    {
+      "path": "/assets/KaTeX_Fraktur-Bold-BdnERNNW.ttf",
+      "status": 200,
+      "bytes": 19584
+    },
+    {
+      "path": "/assets/KaTeX_Fraktur-Bold-BsDP51OF.woff",
+      "status": 200,
+      "bytes": 13296
+    },
+    {
+      "path": "/assets/KaTeX_Fraktur-Bold-CL6g_b3V.woff2",
+      "status": 200,
+      "bytes": 11348
+    },
+    {
+      "path": "/assets/KaTeX_Fraktur-Regular-CB_wures.ttf",
+      "status": 200,
+      "bytes": 19572
+    },
+    {
+      "path": "/assets/KaTeX_Fraktur-Regular-CTYiF6lA.woff2",
+      "status": 200,
+      "bytes": 11316
+    },
+    {
+      "path": "/assets/KaTeX_Fraktur-Regular-Dxdc4cR9.woff",
+      "status": 200,
+      "bytes": 13208
+    },
+    {
+      "path": "/assets/KaTeX_Main-Bold-Cx986IdX.woff2",
+      "status": 200,
+      "bytes": 25324
+    },
+    {
+      "path": "/assets/KaTeX_Main-Bold-Jm3AIy58.woff",
+      "status": 200,
+      "bytes": 29912
+    },
+    {
+      "path": "/assets/KaTeX_Main-Bold-waoOVXN0.ttf",
+      "status": 200,
+      "bytes": 51336
+    },
+    {
+      "path": "/assets/KaTeX_Main-BoldItalic-DxDJ3AOS.woff2",
+      "status": 200,
+      "bytes": 16780
+    },
+    {
+      "path": "/assets/KaTeX_Main-BoldItalic-DzxPMmG6.ttf",
+      "status": 200,
+      "bytes": 32968
+    },
+    {
+      "path": "/assets/KaTeX_Main-BoldItalic-SpSLRI95.woff",
+      "status": 200,
+      "bytes": 19412
+    },
+    {
+      "path": "/assets/KaTeX_Main-Italic-3WenGoN9.ttf",
+      "status": 200,
+      "bytes": 33580
+    },
+    {
+      "path": "/assets/KaTeX_Main-Italic-BMLOBm91.woff",
+      "status": 200,
+      "bytes": 19676
+    },
+    {
+      "path": "/assets/KaTeX_Main-Italic-NWA7e6Wa.woff2",
+      "status": 200,
+      "bytes": 16988
+    },
+    {
+      "path": "/assets/KaTeX_Main-Regular-B22Nviop.woff2",
+      "status": 200,
+      "bytes": 26272
+    },
+    {
+      "path": "/assets/KaTeX_Main-Regular-Dr94JaBh.woff",
+      "status": 200,
+      "bytes": 30772
+    },
+    {
+      "path": "/assets/KaTeX_Main-Regular-ypZvNtVU.ttf",
+      "status": 200,
+      "bytes": 53580
+    },
+    {
+      "path": "/assets/KaTeX_Math-BoldItalic-B3XSjfu4.ttf",
+      "status": 200,
+      "bytes": 31196
+    },
+    {
+      "path": "/assets/KaTeX_Math-BoldItalic-CZnvNsCZ.woff2",
+      "status": 200,
+      "bytes": 16400
+    },
+    {
+      "path": "/assets/KaTeX_Math-BoldItalic-iY-2wyZ7.woff",
+      "status": 200,
+      "bytes": 18668
+    },
+    {
+      "path": "/assets/KaTeX_Math-Italic-DA0__PXp.woff",
+      "status": 200,
+      "bytes": 18748
+    },
+    {
+      "path": "/assets/KaTeX_Math-Italic-flOr_0UB.ttf",
+      "status": 200,
+      "bytes": 31308
+    },
+    {
+      "path": "/assets/KaTeX_Math-Italic-t53AETM-.woff2",
+      "status": 200,
+      "bytes": 16440
+    },
+    {
+      "path": "/assets/KaTeX_SansSerif-Bold-CFMepnvq.ttf",
+      "status": 200,
+      "bytes": 24504
+    },
+    {
+      "path": "/assets/KaTeX_SansSerif-Bold-D1sUS0GD.woff2",
+      "status": 200,
+      "bytes": 12216
+    },
+    {
+      "path": "/assets/KaTeX_SansSerif-Bold-DbIhKOiC.woff",
+      "status": 200,
+      "bytes": 14408
+    },
+    {
+      "path": "/assets/KaTeX_SansSerif-Italic-C3H0VqGB.woff2",
+      "status": 200,
+      "bytes": 12028
+    },
+    {
+      "path": "/assets/KaTeX_SansSerif-Italic-DN2j7dab.woff",
+      "status": 200,
+      "bytes": 14112
+    },
+    {
+      "path": "/assets/KaTeX_SansSerif-Italic-YYjJ1zSn.ttf",
+      "status": 200,
+      "bytes": 22364
+    },
+    {
+      "path": "/assets/KaTeX_SansSerif-Regular-BNo7hRIc.ttf",
+      "status": 200,
+      "bytes": 19436
+    },
+    {
+      "path": "/assets/KaTeX_SansSerif-Regular-CS6fqUqJ.woff",
+      "status": 200,
+      "bytes": 12316
+    },
+    {
+      "path": "/assets/KaTeX_SansSerif-Regular-DDBCnlJ7.woff2",
+      "status": 200,
+      "bytes": 10344
+    },
+    {
+      "path": "/assets/KaTeX_Script-Regular-C5JkGWo-.ttf",
+      "status": 200,
+      "bytes": 16648
+    },
+    {
+      "path": "/assets/KaTeX_Script-Regular-D3wIWfF6.woff2",
+      "status": 200,
+      "bytes": 9644
+    },
+    {
+      "path": "/assets/KaTeX_Script-Regular-D5yQViql.woff",
+      "status": 200,
+      "bytes": 10588
+    },
+    {
+      "path": "/assets/KaTeX_Size1-Regular-C195tn64.woff",
+      "status": 200,
+      "bytes": 6496
+    },
+    {
+      "path": "/assets/KaTeX_Size1-Regular-Dbsnue_I.ttf",
+      "status": 200,
+      "bytes": 12228
+    },
+    {
+      "path": "/assets/KaTeX_Size1-Regular-mCD8mA8B.woff2",
+      "status": 200,
+      "bytes": 5468
+    },
+    {
+      "path": "/assets/KaTeX_Size2-Regular-B7gKUWhC.ttf",
+      "status": 200,
+      "bytes": 11508
+    },
+    {
+      "path": "/assets/KaTeX_Size2-Regular-Dy4dx90m.woff2",
+      "status": 200,
+      "bytes": 5208
+    },
+    {
+      "path": "/assets/KaTeX_Size2-Regular-oD1tc_U0.woff",
+      "status": 200,
+      "bytes": 6188
+    },
+    {
+      "path": "/assets/KaTeX_Size3-Regular-CTq5MqoE.woff",
+      "status": 200,
+      "bytes": 4420
+    },
+    {
+      "path": "/assets/KaTeX_Size3-Regular-DgpXs0kz.ttf",
+      "status": 200,
+      "bytes": 7588
+    },
+    {
+      "path": "/assets/KaTeX_Size4-Regular-BF-4gkZK.woff",
+      "status": 200,
+      "bytes": 5980
+    },
+    {
+      "path": "/assets/KaTeX_Size4-Regular-DWFBv043.ttf",
+      "status": 200,
+      "bytes": 10364
+    },
+    {
+      "path": "/assets/KaTeX_Size4-Regular-Dl5lxZxV.woff2",
+      "status": 200,
+      "bytes": 4928
+    },
+    {
+      "path": "/assets/KaTeX_Typewriter-Regular-C0xS9mPB.woff",
+      "status": 200,
+      "bytes": 16028
+    },
+    {
+      "path": "/assets/KaTeX_Typewriter-Regular-CO6r4hn1.woff2",
+      "status": 200,
+      "bytes": 13568
+    },
+    {
+      "path": "/assets/KaTeX_Typewriter-Regular-D3Ib7_Hf.ttf",
+      "status": 200,
+      "bytes": 27556
+    },
+    {
+      "path": "/assets/index-4CuHIj1O.js",
+      "status": 200,
+      "bytes": 872375
+    },
+    {
+      "path": "/assets/index-CgMZEh8F.css",
+      "status": 200,
+      "bytes": 107283
+    },
+    {
+      "path": "/favicon.svg",
+      "status": 200,
+      "bytes": 712
+    },
+    {
+      "path": "/icon.svg",
+      "status": 200,
+      "bytes": 360
+    },
+    {
+      "path": "/index.html",
+      "status": 200,
+      "bytes": 925
+    },
+    {
+      "path": "/og.png",
+      "status": 200,
+      "bytes": 2356420
+    }
+  ],
+  "guards": {
+    "missing": 404,
+    "unsupportedMethod": 405,
+    "traversal": 403
+  },
+  "passed": true
+}

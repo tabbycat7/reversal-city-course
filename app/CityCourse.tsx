@@ -1,0 +1,99 @@
+'use client';
+import 'katex/dist/katex.min.css';
+import '@xyflow/react/dist/style.css';
+import { useState, useEffect, useRef, useId, type ReactNode } from 'react';
+import { AnimatePresence, motion, MotionConfig, useReducedMotion } from 'motion/react';
+import { Map, BookOpen, Volume2, VolumeX, Settings2, ArrowRight, ArrowLeft, Check, LockKeyhole, X, Compass, Lightbulb, RotateCcw, Play, Pause, GraduationCap, Flag, ExternalLink, ListOrdered, ChevronDown } from 'lucide-react';
+import { SCENES, CHAPTERS, chapterFor, scopeFor, partFor, coreQuestionFor, introducesSymbol } from '../content/course';
+import { SYMBOLS } from '../content/symbols';
+import { freshSave, freshProgress, readStoredSave, writeStoredSave, STORAGE_KEY, canVisit, type Save, type Mode, type SceneState, type CourseProgress } from '../lib/domain';
+import { SymbolNote } from '../components/shared';
+import { SceneTask, HYPOTHESES } from '../components/scenes';
+import { IndependentExam } from '../components/exam';
+const pad=(n:number)=>String(n).padStart(2,'0');
+function Modal({title,children,onClose,wide=false}:{title:string;children:ReactNode;onClose:()=>void;wide?:boolean}){
+ const ref=useRef<HTMLDialogElement>(null),id=useId();
+ useEffect(()=>{const d=ref.current;d?.showModal();return()=>{d?.close();};},[]);
+ return <dialog ref={ref} className={'modal '+(wide?'wide':'')} aria-labelledby={id} onCancel={e=>{e.preventDefault();onClose();}}><div className="modal-heading"><h2 id={id}>{title}</h2><button className="icon-button" aria-label="关闭窗口" onClick={onClose}><X size={20}/></button></div>{children}</dialog>;
+}
+// Fast index into all 40 scenes. The city map stays the scenic route; this is the shortcut.
+function SceneNav({progress,mode,current,onJump}:{progress:CourseProgress;mode:Mode;current:number;onJump:(n:number)=>void}){
+ const [open,setOpen]=useState(false);
+ return <nav className={'scene-nav'+(open?' open':'')} aria-label="幕次快速导航">
+  <button className="scene-nav-toggle" aria-expanded={open} onClick={()=>setOpen(v=>!v)}><ListOrdered size={15}/>第 {pad(current)} / 40 幕<ChevronDown size={14}/></button>
+  <div className="scene-nav-track">{CHAPTERS.map(c=><div className="scene-nav-group" key={c.id}><span>{c.name}</span><div>{Array.from({length:c.end-c.start+1},(_,i)=>i+c.start).map(n=>{
+   const done=progress.completed.includes(n),allowed=canVisit(progress,n,mode);
+   return <button key={n} className={'scene-chip'+(n===current?' current':'')+(done?' done':'')} disabled={!allowed} aria-current={n===current?'step':undefined} aria-label={'第'+pad(n)+'幕 '+SCENES[n-1].title+(done?'，已完成':allowed?'':'，未解锁')} onClick={()=>onJump(n)}>{done&&n!==current?<Check size={11}/>:pad(n)}</button>;
+  })}</div></div>)}</div>
+ </nav>;
+}
+function CityMap({progress,mode,onJump}:{progress:CourseProgress;mode:Mode;onJump:(n:number)=>void}){
+ const [chapter,setChapter]=useState(chapterFor(progress.scene).id);
+ return <div className="city-map"><div className="map-mobile-intro"><h3>下一站，去哪里？</h3><span>已完成 {progress.completed.length} / 40</span></div><div className="map-art" style={{backgroundImage:'url("/art/city-map.png")'}}><div className="map-caption"><span>YOUR NEXT DISCOVERY</span><h3>下一站，去哪里？</h3><p>已完成 {progress.completed.length} / 40 个任务</p></div>{CHAPTERS.map(c=>{const accessible=mode==='teacher'||canVisit(progress,c.start,mode);const all=Array.from({length:c.end-c.start+1},(_,i)=>i+c.start).every(n=>progress.completed.includes(n));return <button key={c.id} className={'map-pin '+(chapter===c.id?'selected':'')+(accessible?'':' locked')} style={{left:c.x+'%',top:c.y+'%'}} onClick={()=>setChapter(c.id)} aria-label={'地图地点：'+c.name}><span>{all?<Check size={18}/>:accessible?<Compass size={18}/>:<LockKeyhole size={16}/>}</span><b>{c.name}</b></button>;})}</div><div className="map-chapter"><div><span>第 {chapter+1} 站</span><h3>{CHAPTERS[chapter].name}</h3><p>{CHAPTERS[chapter].subtitle}</p></div><div className="map-scene-list">{SCENES.filter(s=>chapterFor(s.id).id===chapter).map(s=><button key={s.id} disabled={!canVisit(progress,s.id,mode)} onClick={()=>onJump(s.id)}><span>{progress.completed.includes(s.id)?'✓':pad(s.id)}</span>{s.title}</button>)}</div></div><p className="micro">学生按学习任务解锁；教师可自由选择任何一幕。地图为原创虚构城市，不是伯克利历史地图。</p></div>;
+}
+export default function CityCourse(){
+ const [save,setSave]=useState<Save>(freshSave),[ready,setReady]=useState(false),[storageError,setStorageError]=useState(false);
+ const [modal,setModal]=useState<'map'|'symbols'|'settings'|'sources'|null>(null),[hintOpen,setHintOpen]=useState(false),[reference,setReference]=useState(false),[paused,setPaused]=useState(false),[resetCount,setResetCount]=useState(0),[resetConfirm,setResetConfirm]=useState(false);
+ const [askReset,setAskReset]=useState(false),[dismissedParts,setDismissedParts]=useState<string[]>([]);
+ const systemReduced=useReducedMotion();
+ // Read once after hydration: the server and first client render share an empty save.
+ // eslint-disable-next-line react-hooks/set-state-in-effect
+ useEffect(()=>{const loaded=readStoredSave(()=>window.localStorage.getItem(STORAGE_KEY));setSave(loaded.save);setStorageError(!loaded.available);setReady(true);},[]);
+ // Report an external storage failure without blocking the in-memory course.
+ // eslint-disable-next-line react-hooks/set-state-in-effect
+ useEffect(()=>{if(ready&&!writeStoredSave(v=>window.localStorage.setItem(STORAGE_KEY,v),save))setStorageError(true);},[save,ready]);
+ const courseMode=save.mode==='teacher'?'teacher':'explore',progress=save[courseMode],isExam=save.mode==='exam';
+ const sceneId=isExam?26+save.exam.question:progress.scene,scene=SCENES[sceneId-1],chapter=chapterFor(sceneId),part=partFor(sceneId);
+ const state=progress.states[String(sceneId)]||{},done=progress.completed.includes(sceneId),scope=scopeFor(sceneId,state.hypothesis!==undefined);
+ const mood=state.wrong||hintOpen?'thinking':done?'discovery':[5,10,18,20,21,24,25,29,32,33,35].includes(sceneId)?'pointing':'talking';
+ const reduced=save.settings.reduced||!!systemReduced,initial=HYPOTHESES[Number(progress.states['1']?.hypothesis)]||'',reflection=String(progress.states['37']?.reflection||'');
+ const hintLevel=progress.hints[sceneId]||0;
+ const playTone=()=>{if(!save.settings.sound)return;try{const a=new AudioContext(),o=a.createOscillator(),g=a.createGain();o.connect(g);g.connect(a.destination);o.type='sine';o.frequency.setValueAtTime(660,a.currentTime);o.frequency.exponentialRampToValueAtTime(880,a.currentTime+.15);g.gain.setValueAtTime(.03,a.currentTime);g.gain.exponentialRampToValueAtTime(.001,a.currentTime+.35);o.start();o.stop(a.currentTime+.36);o.onended=()=>{void a.close();};}catch{/* Sound is optional; learning stays available. */}};
+ const patch=(p:SceneState)=>setSave(prev=>{const current=prev[courseMode];return {...prev,[courseMode]:{...current,states:{...current.states,[sceneId]:{...(current.states[sceneId]||{}),...p}}}};});
+ const complete=(message?:string)=>{setSave(prev=>{const current=prev[courseMode];return {...prev,[courseMode]:{...current,completed:current.completed.includes(sceneId)?current.completed:[...current.completed,sceneId],states:{...current.states,[sceneId]:{...(current.states[sceneId]||{}),...(message?{feedback:message,wrong:false}:{})}}}};});if(!done)playTone();};
+ const jump=(n:number)=>{if(!canVisit(progress,n,save.mode))return;setSave(prev=>({...prev,[courseMode]:{...prev[courseMode],scene:n}}));setModal(null);setHintOpen(false);setReference(false);setResetConfirm(false);window.scrollTo({top:0,behavior:'instant'});};
+ const switchMode=(mode:Mode)=>{setSave(prev=>({...prev,mode}));setHintOpen(false);setReference(false);setModal(null);window.scrollTo({top:0,behavior:'instant'});};
+ const setSetting=(key:keyof Save['settings'],value:boolean)=>setSave(prev=>({...prev,settings:{...prev.settings,[key]:value}}));
+ const resetScene=()=>{setSave(prev=>{const p=prev[courseMode],states={...p.states},hints={...p.hints};delete states[sceneId];delete hints[sceneId];return {...prev,[courseMode]:{...p,states,hints,completed:p.completed.filter(n=>n!==sceneId)}};});setResetCount(n=>n+1);setResetConfirm(false);};
+ // Progress can be wiped for just this mode or for everything; display preferences survive both.
+ const resetProgress=(scope:'current'|'all')=>{
+  setSave(prev=>scope==='all'?{...freshSave(),settings:prev.settings}:prev.mode==='exam'?{...prev,exam:freshSave().exam}:{...prev,[courseMode]:freshProgress()});
+  setAskReset(false);setModal(null);setHintOpen(false);setReference(false);setResetConfirm(false);setResetCount(n=>n+1);setDismissedParts([]);
+  window.scrollTo({top:0,behavior:'instant'});
+ };
+ const nextHint=()=>{setSave(prev=>({...prev,[courseMode]:{...prev[courseMode],hints:{...prev[courseMode].hints,[sceneId]:Math.min(3,(prev[courseMode].hints[sceneId]||0)+1)}}}));setHintOpen(true);};
+ const openHint=()=>{if(hintLevel===0)nextHint();else setHintOpen(true);};
+ const changeExam=(key:string,value:string)=>setSave(prev=>({...prev,exam:{...prev.exam,answers:{...prev.exam.answers,[key]:value},submitted:false}}));
+ const setQuestion=(n:number)=>{setSave(prev=>({...prev,exam:{...prev.exam,question:n}}));document.getElementById('mission')?.scrollIntoView({behavior:'instant',block:'start'});};
+ const currentScopeName=save.mode==='exam'?'独立高考答卷':save.mode==='teacher'?'教师演示进度':'学生探索进度';
+ if(!ready)return <div className="course-loading" role="status"><Compass size={38}/><h1>反转之城</h1><p>正在展开你的城市地图……</p></div>;
+ return <MotionConfig reducedMotion={reduced?'always':'user'}><div className={'city-app '+(reduced?'reduced ':'')+(paused&&save.mode==='teacher'?'paused ':'')+(save.settings.large?'large-type':'')}>
+ <a className="skip-link" href="#mission">跳到当前任务</a>
+ <header className="city-header"><button className="brand" onClick={()=>setModal('map')} aria-label="反转之城，打开城市地图"><span className="brand-mark"><Compass size={25}/></span><span>反转之城<small>THE CITY OF REVERSALS</small></span></button><nav className="header-nav" aria-label="课程工具"><button aria-label="城市地图" onClick={()=>setModal('map')}><Map size={17}/><span>城市地图</span></button><button aria-label="工具手册" onClick={()=>setModal('symbols')}><BookOpen size={17}/><span>工具手册</span></button></nav><div className="header-actions"><label className="mode-switch"><span className="sr-only">学习模式</span><select aria-label="学习模式" value={save.mode} onChange={e=>switchMode(e.target.value as Mode)}><option value="explore">学生探索</option><option value="teacher">教师演示</option><option value="exam">独立高考</option></select></label><button className="icon-button" aria-label={save.settings.sound?'关闭声音':'开启声音'} onClick={()=>setSetting('sound',!save.settings.sound)}>{save.settings.sound?<Volume2 size={18}/>:<VolumeX size={18}/>}</button><button className="icon-button" aria-label="打开显示设置" onClick={()=>setModal('settings')}><Settings2 size={18}/></button></div></header>
+ <div className="scope-strip"><span className="scope-label"><i/>{isExam?'高考迁移 · 独立模拟答卷':scope.label}</span><span className="scope-detail">{isExam?'本地保存 · 共17分 · 与探索答卷分离':scope.detail}</span><span className="core-question" title="当前核心问题">正在追问：{isExam?'怎样把这条思路写成数学？':coreQuestionFor(sceneId)}</span><span className="analysis-level">{scope.level}</span></div>
+ {!isExam&&<SceneNav progress={progress} mode={save.mode} current={sceneId} onJump={jump}/>}
+ {storageError&&<div role="status" className="storage-warning">当前浏览器暂不能保存进度。你仍可完成全部学习；关闭页面后记录可能丢失。</div>}
+ <main><section className={'scene-stage chapter-'+chapter.id} aria-label={chapter.name+'场景'}><div className="scene-art" style={{backgroundImage:'url("/art/'+chapter.art+'")'}}/><div className="scene-wash"/><div className="scene-content"><div className="scene-eyebrow"><span>CHAPTER 0{chapter.id+1}</span><i/>{chapter.name}<b>{pad(sceneId)} / 40</b></div><h1>{isExam&&save.exam.submitted?'每一步推理，都值得看见。':scene.title}</h1><p>{isExam?'五问串起一条思路，把学过的工具变成自己的判断。':scene.question}</p><div className="mission-badge"><span className="tiny-spark">✦</span>{isExam?'独立高考 · 17分综合挑战':scene.objective}</div></div>
+ {sceneId===1&&state.hypothesis===undefined&&!isExam?<div className="billboards" aria-label="全校总体录取率"><div><span>全校男性 · 约</span><strong>44<small>%</small></strong><i>1973 · BERKELEY</i></div><div><span>全校女性 · 约</span><strong>35<small>%</small></strong><i>1973 · BERKELEY</i></div></div>:<div className="scene-placard"><span>FIELD NOTES / {pad(sceneId)}</span><b>{chapter.subtitle}</b><small>{done&&!isExam?'这条思路，已经被你点亮。':'让每个结论，都有来处。'}</small></div>}
+ <div className="scene-caption">原创虚构城市场景 · 教学数据另行标注</div><button className="stage-map-button" onClick={()=>setModal('map')}><Map size={17}/>查看全城</button></section>
+ <section className="mission-workbench" id="mission" aria-label="当前互动任务"><div className="workbench-heading"><div><span className="small-cap">{isExam?'THE REASONING TOWER · 独立答卷':part.label+' · '+part.name}</span><h2>{isExam?save.exam.submitted?'能力报告':'你的独立答卷':scene.objective}</h2></div><div className="workbench-tools">{!isExam&&<><button className="text-button" onClick={openHint}><Lightbulb size={15}/>提示 {hintLevel}/3</button><button className="icon-button" aria-label="重置当前任务" onClick={()=>setResetConfirm(true)}><RotateCcw size={16}/></button></>}{done&&!isExam&&<span className="done-stamp"><Check size={14}/>已验证</span>}</div></div>
+ {!isExam&&sceneId===part.start&&!dismissedParts.includes(part.id)&&<aside className="part-opening"><div><span>{part.label} · {part.name}</span><h3>{part.title}</h3><p>{part.lead}</p></div><button className="icon-button" aria-label="收起本部分说明" onClick={()=>setDismissedParts(v=>[...v,part.id])}><X size={17}/></button></aside>}
+ <SymbolNote names={scene.symbols} open={!isExam&&introducesSymbol(sceneId)}/>
+ {hintOpen&&!isExam&&<div className="hint-panel"><Lightbulb size={18}/><div><strong>提示 {Math.max(1,hintLevel)} / 3</strong><p>{scene.hints[Math.max(1,hintLevel)-1]}</p>{hintLevel<3&&<button className="text-button" onClick={nextHint}>还是不确定，再来一条提示</button>}</div><button className="icon-button" aria-label="收起提示" onClick={()=>setHintOpen(false)}><X size={16}/></button></div>}
+ {resetConfirm&&!isExam&&<div className="submission-confirm"><p>只重置当前模式的这一幕，其他模式和独立答卷不受影响。</p><button className="secondary" onClick={resetScene}>确认重置本幕</button><button className="text-button" onClick={()=>setResetConfirm(false)}>保留当前进度</button></div>}
+ <AnimatePresence mode="wait" initial={false}><motion.div key={save.mode+'-'+sceneId+'-'+resetCount} initial={{opacity:0,y:reduced?0:8}} animate={{opacity:1,y:0}} exit={{opacity:0}} transition={{duration:reduced?0:.2}}>
+ {isExam?<IndependentExam question={save.exam.question} answers={save.exam.answers} submitted={save.exam.submitted} change={changeExam} setQuestion={setQuestion} onSubmit={()=>setSave(prev=>({...prev,exam:{...prev.exam,submitted:true}}))} onEdit={()=>setSave(prev=>({...prev,exam:{...prev.exam,submitted:false}}))}/>:<SceneTask id={sceneId} state={state} patch={patch} complete={complete} done={done} initial={initial} finalReflection={reflection} completed={progress.completed.length}/>}
+ </motion.div></AnimatePresence>
+ {!isExam&&<><div className="dialogue-row"><div className={'alan-avatar '+mood} role="img" aria-label={'阿岚，'+(state.wrong?'思考':done?'有所发现':'讲解')}/><div className="dialogue-copy"><span>阿岚 <small>你的调查搭档</small></span><p>{state.wrong?String(state.feedback||'我们回到数据里找线索。'):done?scene.bridge||'带着这些问题，继续观察现实世界吧。':scene.dialogue}</p></div><div className="robot-avatar" role="img" aria-label="眨眼的导航机器人"/></div>
+ {save.mode==='teacher'&&<div className="teacher-tools"><label>快速跳关<select aria-label="教师选择幕次" value={sceneId} onChange={e=>jump(Number(e.target.value))}>{SCENES.map(s=><option key={s.id} value={s.id}>{pad(s.id)} · {s.title}</option>)}</select></label><button className="secondary" onClick={()=>setPaused(v=>!v)}>{paused?<Play size={15}/>:<Pause size={15}/>} {paused?'继续演示动画':'暂停演示动画'}</button><button className="secondary" onClick={()=>setReference(v=>!v)}><GraduationCap size={16}/>{reference?'收起参考解释':'显示参考解释'}</button></div>}
+ {reference&&save.mode==='teacher'&&<aside className="reference-panel"><b>教师参考 · 本幕核心解释</b><p>{scene.reference}</p></aside>}
+ {done&&sceneId===chapter.end&&<div className="chapter-reward"><Compass size={24}/><div><span>新分析工具已入手</span><b>{chapter.tool}</b></div><button className="text-button" onClick={()=>setModal('symbols')}>收进工具手册 <BookOpen size={15}/></button></div>}<div className="mission-navigation"><button className="text-button" disabled={sceneId===1} onClick={()=>jump(sceneId-1)}><ArrowLeft size={16}/>上一幕</button><span>{progress.completed.length} / 40 条思路已点亮</span>{sceneId<40?<button className="primary" disabled={!done&&save.mode!=='teacher'} onClick={()=>jump(sceneId+1)}>{sceneId===chapter.end?'前往 '+CHAPTERS[chapter.id+1].name:'前往下一幕'}<ArrowRight size={17}/></button>:<button className="primary" onClick={()=>setModal('map')}><Flag size={17}/>回看我的旅程</button>}</div></>}
+ </section></main>
+ <footer className="city-footer"><span>反转之城 · 数学的价值，是判断数字能说明什么。</span><button onClick={()=>setModal('sources')}>数据与制作说明 <ExternalLink size={12}/></button><span className="save-status">{ready?(storageError?'仅本次会话':'进度仅保存在本机'):'正在读取本地进度'}</span></footer>
+ {modal==='map'&&<Modal title="反转之城 · 探索地图" wide onClose={()=>setModal(null)}><CityMap mode={save.mode==='exam'?'explore':save.mode} progress={progress} onJump={n=>{if(isExam)switchMode('explore');jump(n);}}/></Modal>}
+ {modal==='symbols'&&<Modal title="随身工具手册" onClose={()=>setModal(null)}><div className="tool-collection">{CHAPTERS.map(c=><span className={progress.completed.includes(c.end)?'earned':''} key={c.id}>{progress.completed.includes(c.end)?<Check size={14}/>:<LockKeyhole size={13}/>} {c.tool}</span>)}</div><p className="micro">这里收着全课用到的字母。每一幕第一次遇到某个字母时，任务上方也会自动展开它的说明。</p><SymbolNote names={Object.keys(SYMBOLS)} open/></Modal>}
+ {modal==='settings'&&<Modal title="按你的节奏探索" onClose={()=>setModal(null)}><div className="settings-list"><label><input type="checkbox" checked={save.settings.sound} onChange={e=>setSetting('sound',e.target.checked)}/><span><b>任务完成音效</b><small>默认关闭；开启后仅播放短促柔和提示音。</small></span></label><label><input type="checkbox" checked={save.settings.reduced} onChange={e=>setSetting('reduced',e.target.checked)}/><span><b>减少动态 / 跳过演出</b><small>关闭位移、眨眼和过渡，不跳过学习任务；也尊重系统偏好。</small></span></label><label><input type="checkbox" checked={save.settings.large} onChange={e=>setSetting('large',e.target.checked)}/><span><b>投影大字</b><small>放大正文、任务控件和公式，适合教室演示。</small></span></label></div><p>没有账号、排行榜或分析埋点。课堂演示、学生探索和独立答卷分别保存；清除浏览器站点数据会清除记录。</p>
+ <div className="danger-zone"><b>重置进度</b><p className="micro">只清除学习记录。声音、减少动态和投影大字等偏好会保留。此操作不能撤销。</p>{askReset?<div className="reset-choice" role="group" aria-label="选择重置范围"><button className="secondary" onClick={()=>resetProgress('current')}>只重置{currentScopeName}</button><button className="secondary danger" onClick={()=>resetProgress('all')}>重置全部学习记录（探索＋教师演示＋独立高考）</button><button className="text-button" onClick={()=>setAskReset(false)}>取消</button></div>:<button className="secondary" onClick={()=>setAskReset(true)}><RotateCcw size={15}/>重置全局进度</button>}</div></Modal>}
+ {modal==='sources'&&<Modal title="数据与制作说明" onClose={()=>setModal(null)}><div className="sources-content"><h3>历史数据和模拟数据分开使用</h3><p>全校背景为1973年伯克利12,763份研究生申请，录取率44%与35%是整数近似值。R官方UCBAdmissions数据包含六个大院系的4526份记录；A/D教学切片取其中的1725份记录，并非全校背景的直接拆解。</p><p>因果训练与高考题使用两套独立模拟数据。改变权重是基于历史组内率的模拟，不改写原始记录。因果图表达假设，不代表由数据自动证明。</p><a href="https://stat.ethz.ch/R-manual/R-devel/library/datasets/html/UCBAdmissions.html" target="_blank" rel="noreferrer">R 官方 UCBAdmissions 说明 ↗</a><p>原论文：Bickel、Hammel、O’Connell (1975)，Sex Bias in Graduate Admissions: Data from Berkeley，Science 187，398–404。</p><h3>原创场景与本地制作</h3><p>地图、六个场景和角色为imagegen生成的原创虚构美术，不是历史照片。所有数据、公式与交互均由网页绘制。使用React、KaTeX、React Flow、Motion与Lucide开源组件。</p><p>此项目仅本地运行，不上传答卷，不依赖联网聊天服务。</p></div></Modal>}
+ </div></MotionConfig>;
+}
